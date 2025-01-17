@@ -48,96 +48,45 @@ export class UserService {
 
  }
 
-//  async login (loginDto:loginDto, res:any) : Promise<{message:string}> {
+ async login (loginDto:loginDto, res:any) : Promise<{message:string}> {
 
-//   const{email, password, role} = loginDto
+  const{email, password, role} = loginDto
 
-//   //check user is exist or not
-//   const userExist = await this.userModel.findOne({email})
-//   if(!userExist){
-//     throw new UnauthorizedException("Invalid email or password")
-//   }
+  //check user is exist or not
+  const userExist = await this.userModel.findOne({email})
+  if(!userExist){
+    throw new UnauthorizedException("Invalid email or password")
+  }
   
-//   //chech password match
-//   const isMatchPassword = await bcrypt.compare(password,userExist.password)
+  //chech password match
+  const isMatchPassword = await bcrypt.compare(password,userExist.password)
 
-//   if(!isMatchPassword){
-//     throw new UnauthorizedException("Invalid email or password")
-//   }
-
-//   //validate role
-//   if(userExist.role !== role){
-//     throw new UnauthorizedException("Role does not match")
-//   }
-
-//   //create token for user
-//   const token = this.jwtService.sign({id:userExist._id, email:userExist.email})
-
-//   //pass token through cookie
-//   res.cookie('authToken', token ,{
-//     httpOnly:true,
-//     maxAge: 24 * 60 * 60 * 1000
-//   })
-
-
-
-//   return({message:"User login successfull"})
-
-//  }
-async login(loginDto: loginDto, res: any): Promise<{ message: string }> {
-  const { email, password, role } = loginDto;
-
-  console.log('Login request received:', loginDto);
-
-  // Check if user exists
-  const userExist = await this.userModel.findOne({ email });
-  if (!userExist) {
-    console.log('User not found');
-    throw new UnauthorizedException('Invalid email or password');
+  if(!isMatchPassword){
+    throw new UnauthorizedException("Invalid email or password")
   }
 
-  console.log('User found:', userExist);
-
-  // Validate password
-  const isMatchPassword = await bcrypt.compare(password, userExist.password);
-  if (!isMatchPassword) {
-    console.log('Password mismatch');
-    throw new UnauthorizedException('Invalid email or password');
+  //validate role
+  if(userExist.role !== role){
+    throw new UnauthorizedException("Role does not match")
   }
 
-  console.log('Password matched');
-
-  // Validate role
-  if (userExist.role !== role) {
-    console.log('Role mismatch:', { expected: userExist.role, provided: role });
-    throw new UnauthorizedException('Role does not match');
+  //check user status
+  if(userExist.isBlocked){
+    throw new UnauthorizedException('Your account has been blocked. Contact help to support')
   }
 
-  console.log('Role matched');
+  //create token for user
+  const token = this.jwtService.sign({id:userExist._id, email:userExist.email})
 
-  // Create JWT token
-  const token = this.jwtService.sign({
-    id: userExist._id,
-    email: userExist.email,
-    role: userExist.role,
-  });
+  //pass token through cookie
+  res.cookie('authToken', token ,{
+    httpOnly:true,
+    maxAge: 24 * 60 * 60 * 1000
+  })
 
-  console.log('Token created:', token);
-
-  // Set token in a cookie
-  res.cookie('authToken', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 24 * 60 * 60 * 1000, // Expires in 1 day
-  });
-
-  console.log('Token set in cookie');
-
-  // Send the response back to the client
   res.json({ message: 'User login successful' });
 
-  return; // Ensure function terminates after sending response
+  return;
 }
 
 
