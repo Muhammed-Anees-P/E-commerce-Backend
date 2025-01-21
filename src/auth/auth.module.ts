@@ -2,7 +2,8 @@ import { forwardRef, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { jwtStrategy } from 'src/user/jwt_strategy';
+import { jwtStrategy } from 'src/auth/jwt_strategy';
+import { SuperAdminModule } from 'src/super-admin/super-admin.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
@@ -17,7 +18,8 @@ import { UserModule } from 'src/user/user.module';
                 }
             }),
         }),
-        forwardRef(() => UserModule)
+        forwardRef(() => UserModule),
+        forwardRef(() => SuperAdminModule),
     ],
     providers:[jwtStrategy],
     exports:[PassportModule, JwtModule, jwtStrategy]

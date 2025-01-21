@@ -76,7 +76,7 @@ export class UserService {
   }
 
   //create token for user
-  const token = this.jwtService.sign({id:userExist._id, email:userExist.email})
+  const token = this.jwtService.sign({id:userExist._id, email:userExist.email, role:userExist.role})
 
   //pass token through cookie
   res.cookie('authToken', token ,{
@@ -86,6 +86,18 @@ export class UserService {
 
   res.json({ message: 'User login successful' });
 
+  return;
+}
+
+//user logout
+async logout(res:any) :Promise<{message:string}> {
+
+  //clear authentiacation token
+  res.clearCookie('authToken', {
+    httpOnly:true
+  })
+
+  res.json({message:"User logout successfull"})
   return;
 }
 

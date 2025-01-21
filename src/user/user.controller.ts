@@ -17,9 +17,15 @@ export class UserController {
 
   //user login
   @Get('signin')
- login(@Body() loginDto:loginDto , @Res() res:Response) : Promise <{message:string}> {
-  return this.userService.login(loginDto,res)
- }
+  login(@Body() loginDto:loginDto , @Res() res:Response) : Promise <{message:string}> {
+    return this.userService.login(loginDto,res)
+  }
+
+ //user logout
+ @Post('logout')
+ logout(@Res() res:any) :Promise <{message:string}>{
+   return this.userService.logout(res)
+  }
  
   
 }
